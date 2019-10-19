@@ -1,0 +1,5 @@
+# Misc
+.vscode
+
+# Bazel directories
+bazel-*
