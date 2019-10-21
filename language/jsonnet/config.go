@@ -20,7 +20,7 @@ func newJsonnetConfig() *jsonnetConfig {
 		NativeImports:  make(map[string]bool, len(nativeImports)),
 		IgnoreFolders:  make(map[string]bool),
 	}
-	conf.setAllowedImports(strings.Join(nativeImports, ","))
+	conf.setNativeImports(strings.Join(nativeImports, ","))
 	return conf
 }
 

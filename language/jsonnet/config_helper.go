@@ -12,7 +12,7 @@ const (
 )
 
 var (
-	nativeImports = []string{".jsonnet"}
+	nativeImports = []string{".jsonnet", ".libsonnet"}
 )
 
 // stringFlag implements flags.Value for a string flag
