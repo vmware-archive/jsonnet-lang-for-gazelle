@@ -1,5 +1,3 @@
-package jsonnet
-
 // Package jsonnet provides support for jsonnet rules.
 // It generates jsonnet_library rules.
 //
@@ -19,6 +17,7 @@ package jsonnet
 //
 // Dependency resolution
 //
+package jsonnet
 
 import (
 	"github.com/bazelbuild/bazel-gazelle/language"
