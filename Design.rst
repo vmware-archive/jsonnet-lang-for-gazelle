@@ -51,7 +51,7 @@ contain settings that affect the behavior of the program.
 For example:
 
 * A list of allowed imports (non-native extensions, likely for ``importstr`` directives).
-* A list of native imports (defaulted to ``.jsonnet``).
+* A list of native imports (``.jsonnet``, ``.libsonnet``).
 * A list of folders to ignore (the ``BUILD.bazel`` won't be modified).
 
 ``jsonnetConfig`` objects apply to individual directories. Each directory inherits
@@ -66,16 +66,15 @@ directive is a special comment formatted like this:
 Here are a few examples. See the `full list of directives`_.
 
 * ``# gazelle:jsonnet_ignore_folders`` - sets a list of folders to ignore.
-* ``# gazelle:jsonnet_native_imports`` - sets a list of extensions so they are considered native.
 
 Scanning native files
 ---------------------
 
 The information needed to render a jsonnet file is encoded in the file content.
-A ``.jsonnet`` file might import other ``.jsonnet`` files and any kind of text
-file using ``importstr`` directives.
+A jsonnet file might import other jsonnet files and any kind of text file
+using ``importstr`` directives.
 
-Therefore, ``.jsonnet`` files are quite flexible. This tool will not take arbitrary
+Therefore, jsonnet files are quite flexible. This tool will not take arbitrary
 imports into account but they can be defined using gazelle directives. See `Generating rules`_.
 
 Generating rules
@@ -86,7 +85,7 @@ Gazelle generates rules for using those sources.
 
 We may generate the following rules:
 
-* ``jsonnet_library`` are generated for each of the ``.jsonnet`` files found.
+* ``jsonnet_library`` are generated for each of the jsonnet files found.
 * ``filegroup`` are generated for each of the non-native files that have been
   allowed as so. See `Configuration`_.
 

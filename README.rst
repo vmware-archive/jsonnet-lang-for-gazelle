@@ -74,7 +74,6 @@ your repository to build a gazelle binary including the Jsonnet language.
     load("@jsonnet_gazelle//:def.bzl", "jsonnet_library")
 
     # gazelle:jsonnet_allowed_imports json,sh
-    # gazelle:jsonnet_native_imports libsonnet
 
     gazelle(
         name = "gazelle_jsonnet",
@@ -95,7 +94,7 @@ You can pass additional arguments to Gazelle after a ``--`` argument.
 
 .. code::
 
-  $ bazel run //:gazelle_jsonnet -- -jsonnet_native_imports=lisonnet
+  $ bazel run //:gazelle_jsonnet -- -jsonnet_allowed_imports=json
 
 Directives
 ~~~~~~~~~~
@@ -115,7 +114,6 @@ Example
   load("@jsonnet_gazelle//:def.bzl", "jsonnet_library")
 
   # gazelle:jsonnet_allowed_imports json
-  # gazelle:jsonnet_native_imports libsonnet
   # gazelle:jsonnet_ignore_folders scripts
 
   gazelle(
@@ -137,11 +135,6 @@ The following directives are recognized:
 +-----------------------------------------------------+--------------------------------------+
 | Comma-separated list of extensions that are allowed to be imported by default.             |
 | If not specified, Gazelle will process native extensions only.                             |
-+-----------------------------------------------------+--------------------------------------+
-| :direc:`# gazelle:jsonnet_native_imports libsonnet` | :value:`.jsonnet`                    |
-+-----------------------------------------------------+--------------------------------------+
-| Comma-separated list of extensions that are allowed to be imported natively.               |
-| If not specified, Gazelle will process native extensions only."                            |
 +-----------------------------------------------------+--------------------------------------+
 | :direc:`# gazelle:jsonnet_ignore_folders`           | none                                 |
 +-----------------------------------------------------+--------------------------------------+

@@ -42,8 +42,6 @@ func (*jsonnetLang) Configure(c *config.Config, rel string, f *rule.File) {
 			switch d.Key {
 			case allowedImportsDirective:
 				conf.setAllowedImports(d.Value)
-			case nativeImportsDirective:
-				conf.setNativeImports(d.Value)
 			case ignoreFoldersDirective:
 				conf.setIgnoreFolders(d.Value)
 			}
@@ -52,7 +50,6 @@ func (*jsonnetLang) Configure(c *config.Config, rel string, f *rule.File) {
 }
 func (*jsonnetLang) KnownDirectives() []string {
 	return []string{
-		nativeImportsDirective,
 		allowedImportsDirective,
 		ignoreFoldersDirective,
 	}
@@ -62,7 +59,6 @@ func (*jsonnetLang) RegisterFlags(fs *flag.FlagSet, cmd string, c *config.Config
 	switch cmd {
 	case "fix", "update", "update-repos":
 		conf.registerAllowedImportsFlag(fs)
-		conf.registerNativeImportsFlag(fs)
 		conf.registerIgnoreFoldersFlag(fs)
 	default:
 	}

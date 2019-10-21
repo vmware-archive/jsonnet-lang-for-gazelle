@@ -8,7 +8,6 @@ import (
 
 const (
 	allowedImportsDirective = "jsonnet_allowed_imports"
-	nativeImportsDirective  = "jsonnet_native_imports"
 	ignoreFoldersDirective  = "jsonnet_skip_folders"
 )
 
@@ -55,15 +54,6 @@ func (conf *jsonnetConfig) setNativeImports(extensions string) error {
 }
 func (conf *jsonnetConfig) isNativeImport(extension string) bool {
 	return conf.NativeImports[extension]
-}
-func (conf *jsonnetConfig) registerNativeImportsFlag(fs *flag.FlagSet) {
-	fs.Var(
-		stringFlag(conf.setNativeImports),
-		nativeImportsDirective,
-		fmt.Sprintf(
-			"comma-separated list of extensions that are allowed to be imported natively. If not specified, Gazelle will process native extensions only: %s.",
-			strings.Join(nativeImports, ","),
-		))
 }
 
 // setIgnoreFolders implements the stringFlag type so it can be used
