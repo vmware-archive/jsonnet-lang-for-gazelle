@@ -27,3 +27,12 @@ go_register_toolchains()
 load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies")
 
 gazelle_dependencies()
+
+# maintained in sync with go.mod via:
+#
+#     ./update_go_repositories.sh
+#
+load(":repositories.bzl", "go_repositories")
+
+go_repositories()
+
