@@ -9,11 +9,6 @@ var (
 			MergeableAttrs: map[string]bool{"srcs": true},
 			ResolveAttrs:   map[string]bool{"deps": true},
 		},
-		"filegroup": {
-			NonEmptyAttrs:  map[string]bool{"srcs": true},
-			MergeableAttrs: map[string]bool{"srcs": true},
-			ResolveAttrs:   map[string]bool{},
-		},
 	}
 	jsonnetLoads = []rule.LoadInfo{
 		{

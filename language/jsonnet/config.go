@@ -9,16 +9,14 @@ import (
 )
 
 type jsonnetConfig struct {
-	AllowedImports map[string]bool
-	NativeImports  map[string]bool
-	IgnoreFolders  map[string]bool
+	NativeImports map[string]bool
+	IgnoreFolders map[string]bool
 }
 
 func newJsonnetConfig() *jsonnetConfig {
 	conf := &jsonnetConfig{
-		AllowedImports: make(map[string]bool),
-		NativeImports:  make(map[string]bool, len(nativeImports)),
-		IgnoreFolders:  make(map[string]bool),
+		NativeImports: make(map[string]bool, len(nativeImports)),
+		IgnoreFolders: make(map[string]bool),
 	}
 	conf.setNativeImports(strings.Join(nativeImports, ","))
 	return conf
@@ -40,8 +38,6 @@ func (*jsonnetLang) Configure(c *config.Config, rel string, f *rule.File) {
 	if f != nil {
 		for _, d := range f.Directives {
 			switch d.Key {
-			case allowedImportsDirective:
-				conf.setAllowedImports(d.Value)
 			case ignoreFoldersDirective:
 				conf.setIgnoreFolders(d.Value)
 			}
@@ -50,7 +46,6 @@ func (*jsonnetLang) Configure(c *config.Config, rel string, f *rule.File) {
 }
 func (*jsonnetLang) KnownDirectives() []string {
 	return []string{
-		allowedImportsDirective,
 		ignoreFoldersDirective,
 	}
 }
@@ -58,7 +53,6 @@ func (*jsonnetLang) RegisterFlags(fs *flag.FlagSet, cmd string, c *config.Config
 	conf := getJsonnetConfig(c)
 	switch cmd {
 	case "fix", "update", "update-repos":
-		conf.registerAllowedImportsFlag(fs)
 		conf.registerIgnoreFoldersFlag(fs)
 	default:
 	}

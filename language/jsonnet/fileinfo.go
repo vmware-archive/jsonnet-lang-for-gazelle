@@ -16,17 +16,18 @@ var (
 
 // FilePath contains the path information for a file
 type FilePath struct {
-	Dir      string // Relative directory to the root of the code base
+	Dir      string // Relative directory to the root of the code base; it works as pkg ref
 	Ext      string // File name extension
 	Filename string // File name
 	Name     string // File name, without extension
+	Path     string // File path, relative to the root of the code base
 }
 
 // FileInfo contains metadata extracted from a file
 type FileInfo struct {
-	Path       FilePath            // File path information
-	Imports    map[string]FilePath // Pure .jsonnet imports, which will probably depend on others
-	StrImports map[string]FilePath // Plan imports, which do not depend on others
+	Path        FilePath            // File path information
+	Imports     map[string]FilePath // Jsonnet imports, from import
+	DataImports map[string]FilePath // Data imports, from importstr
 }
 
 func jsonnetFileInfo(args language.GenerateArgs, name string) FileInfo {
@@ -37,14 +38,15 @@ func jsonnetFileInfo(args language.GenerateArgs, name string) FileInfo {
 	root := filepath.Clean(strings.TrimSuffix(dir, rel))
 	fp := FilePath{
 		Dir:      rel,
-		Name:     strings.TrimSuffix(name, filepath.Ext(name)),
-		Filename: name,
 		Ext:      filepath.Ext(name),
+		Filename: name,
+		Name:     strings.TrimSuffix(name, filepath.Ext(name)),
+		Path:     filepath.Join(rel, name),
 	}
 	info := FileInfo{
-		Path:       fp,
-		Imports:    make(map[string]FilePath),
-		StrImports: make(map[string]FilePath),
+		Path:        fp,
+		Imports:     make(map[string]FilePath),
+		DataImports: make(map[string]FilePath),
 	}
 
 	if !conf.isNativeImport(fp.Ext) {
@@ -66,35 +68,26 @@ func jsonnetFileInfo(args language.GenerateArgs, name string) FileInfo {
 			impFp := resolveFilePath(root, impPath)
 			ext := filepath.Ext(imp)
 
-			if conf.isNativeImport(ext) {
-				info.Imports[imp] = impFp
-				continue
+			if !conf.isNativeImport(ext) {
+				// Raw JSON can be imported this way too.
+				if ext == ".json" {
+					// We should handle this import as a data import, though
+					info.DataImports[impFp.Path] = impFp
+					continue
+				}
+
+				log.Printf("%s: unknown %s extension for the `import` construct.", impFp.Filename, ext)
+				return info
 			}
 
-			// Normally, jsonnets `import foo` will import .jsonnet files
-			// but you can still rename a .jsonnet file. Let's use the
-			// jsonnet_allowed_imports in that case.
-			if conf.isAllowedImport(ext) {
-				info.StrImports[imp] = impFp
-				continue
-			}
-
-			log.Printf("%s: import is not allowed. Use the jsonnet_allowed_imports directive to allowed it.", impFp.Filename)
-			return info
+			info.Imports[impFp.Path] = impFp
 
 		case match[importstrSubexpIndex] != nil:
 			imp := string(match[importstrSubexpIndex])
 			impPath := filepath.Join(root, rel, imp)
 			impFp := resolveFilePath(root, impPath)
-			ext := filepath.Ext(imp)
 
-			if conf.isAllowedImport(ext) {
-				info.StrImports[imp] = impFp
-				continue
-			}
-
-			log.Printf("%s: import is not allowed. Use the jsonnet_allowed_imports directive to allowed it.", impFp.Filename)
-			return info
+			info.DataImports[impFp.Path] = impFp
 
 		default:
 			// Nothing to extract.
@@ -127,9 +120,10 @@ func resolveFilePath(root string, file string) FilePath {
 
 	fp := FilePath{
 		Dir:      dir,
-		Name:     name,
-		Filename: filename,
 		Ext:      ext,
+		Filename: filename,
+		Name:     name,
+		Path:     filepath.Join(dir, filename),
 	}
 	return fp
 }
