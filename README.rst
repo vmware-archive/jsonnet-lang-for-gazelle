@@ -76,7 +76,7 @@ your repository to build a gazelle binary including the Jsonnet language.
     # gazelle:jsonnet_allowed_imports json,sh
 
     gazelle(
-        name = "gazelle_jsonnet",
+        name = "gazelle",
         gazelle = "//:gazelle_jsonnet_binary",
     )
 
@@ -84,7 +84,7 @@ After adding this code, you can run Gazelle with Bazel.
 
 .. code::
 
-  $ bazel run //:gazelle_jsonnet
+  $ bazel run //:gazelle
 
 This will generate new BUILD.bazel files for your project. You can run the same
 command in the future to update existing BUILD.bazel files to include new source
@@ -94,7 +94,7 @@ You can pass additional arguments to Gazelle after a ``--`` argument.
 
 .. code::
 
-  $ bazel run //:gazelle_jsonnet -- -jsonnet_allowed_imports=json
+  $ bazel run //:gazelle -- -jsonnet_allowed_imports=json
 
 Directives
 ~~~~~~~~~~
