@@ -1,0 +1,30 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
+load("@bazel_gazelle//:def.bzl", "DEFAULT_LANGUAGES", "gazelle", "gazelle_binary")
+
+gazelle_binary(
+    name = "gazelle_jsonnet_binary",
+    languages = DEFAULT_LANGUAGES + [
+        "@jsonnet_gazelle//language/jsonnet:go_default_library",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+# gazelle:prefix github.com/jotadrilo/jsonnet-gazelle/example
+
+gazelle(
+    name = "gazelle",
+    gazelle = "//:gazelle_jsonnet_binary",
+)
+
+go_library(
+    name = "go_default_library",
+    srcs = ["main.go"],
+    importpath = "github.com/jotadrilo/jsonnet-gazelle/example",
+    visibility = ["//visibility:private"],
+)
+
+go_binary(
+    name = "example",
+    embed = [":go_default_library"],
+    visibility = ["//visibility:public"],
+)
