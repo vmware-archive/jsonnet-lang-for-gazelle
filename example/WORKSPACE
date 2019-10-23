@@ -32,7 +32,8 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 # git_repository(
 #     name = "jsonnet_gazelle",
-#     remote = "https://github.com/jotadrilo/jsonnet-gazelle",
+#     branch = "master",
+#     remote = "https://github.com/bitnami/jsonnet-gazelle",
 # )
 local_repository(
     name = "jsonnet_gazelle",

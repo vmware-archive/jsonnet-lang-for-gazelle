@@ -17,7 +17,7 @@ def jsonnet_library(name, srcs, visibility, deps = []): native.filegroup(
 # git_repository(
 #     name = "jsonnet_gazelle",
 #     commit = "master",
-#     remote = "https://github.com/jotadrilo/jsonnet-gazelle",
+#     remote = "https://github.com/bitnami/jsonnet-gazelle",
 # )
 
 

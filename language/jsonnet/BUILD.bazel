@@ -12,7 +12,7 @@ go_library(
         "lang.go",
         "resolve.go",
     ],
-    importpath = "github.com/jotadrilo/jsonnet-gazelle/language/jsonnet",
+    importpath = "github.com/bitnami/jsonnet-gazelle/language/jsonnet",
     visibility = ["//visibility:public"],
     deps = [
         "@bazel_gazelle//config:go_default_library",

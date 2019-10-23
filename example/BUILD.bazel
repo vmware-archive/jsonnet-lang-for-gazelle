@@ -9,7 +9,7 @@ gazelle_binary(
     visibility = ["//visibility:public"],
 )
 
-# gazelle:prefix github.com/jotadrilo/jsonnet-gazelle/example
+# gazelle:prefix github.com/bitnami/jsonnet-gazelle/example
 
 gazelle(
     name = "gazelle",
@@ -19,7 +19,7 @@ gazelle(
 go_library(
     name = "go_default_library",
     srcs = ["main.go"],
-    importpath = "github.com/jotadrilo/jsonnet-gazelle/example",
+    importpath = "github.com/bitnami/jsonnet-gazelle/example",
     visibility = ["//visibility:private"],
 )
 

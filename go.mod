@@ -1,4 +1,4 @@
-module github.com/jotadrilo/jsonnet-gazelle
+module github.com/bitnami/jsonnet-gazelle
 
 go 1.13
 
