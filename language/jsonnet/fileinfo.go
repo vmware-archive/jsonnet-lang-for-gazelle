@@ -33,20 +33,13 @@ type FileInfo struct {
 func jsonnetFileInfo(c *config.Config, dir string, rel string, name string) FileInfo {
 	conf := getJsonnetConfig(c)
 	root := filepath.Clean(strings.TrimSuffix(dir, rel))
-	fp := FilePath{
-		Dir:      rel,
-		Ext:      filepath.Ext(name),
-		Filename: name,
-		Name:     strings.TrimSuffix(name, filepath.Ext(name)),
-		Path:     filepath.Join(rel, name),
-	}
 	info := FileInfo{
-		Path:        fp,
+		Path:        newFilePath(rel, name),
 		Imports:     make(map[string]FilePath),
 		DataImports: make(map[string]FilePath),
 	}
 
-	if !conf.isNativeImport(fp.Ext) {
+	if !conf.isNativeImport(info.Path.Ext) {
 		return info
 	}
 
@@ -112,15 +105,18 @@ func resolveFilePath(root string, file string) FilePath {
 	filedir := filepath.Dir(file)
 	dir := strings.TrimPrefix(strings.TrimPrefix(filedir, root), "/")
 	filename := filepath.Base(file)
-	ext := filepath.Ext(filename)
-	name := strings.TrimSuffix(filename, ext)
+	return newFilePath(dir, filename)
+}
 
+func newFilePath(dir string, file string) FilePath {
+	ext := filepath.Ext(file)
+	name := strings.TrimSuffix(file, ext)
 	fp := FilePath{
 		Dir:      dir,
 		Ext:      ext,
-		Filename: filename,
+		Filename: file,
 		Name:     name,
-		Path:     filepath.Join(dir, filename),
+		Path:     filepath.Join(dir, file),
 	}
 	return fp
 }

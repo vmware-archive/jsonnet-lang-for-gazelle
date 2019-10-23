@@ -2,6 +2,7 @@ package jsonnet
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -30,13 +31,23 @@ func (*jsonnetLang) GenerateRules(args language.GenerateArgs) language.GenerateR
 		return res
 	}
 
+	// Generate map of existing files in the current package
+	// to avoid iterating the array each time we want to check
+	// if a file exists already.
+	// NOTE: We know how many files the workspace contains, but
+	// we don't know how much the workspace is going to grow.
+	pkgFiles := map[string]bool{}
+	for _, name := range args.RegularFiles {
+		pkgFiles[filepath.Join(args.Rel, name)] = true
+	}
+
 	for _, name := range args.RegularFiles {
 		if !conf.isNativeImport(filepath.Ext(name)) {
 			continue
 		}
 		finfo := jsonnetFileInfo(args.Config, args.Dir, args.Rel, name)
 		res.Gen = append(res.Gen, finfo.newLibraryRule(finfo.Path.ruleName(conf, libraryRulePrefix)))
-		res.Gen = append(res.Gen, finfo.newToJSONRule(finfo.Path.ruleName(conf, toJSONRulePrefix)))
+		res.Gen = append(res.Gen, finfo.newToJSONRule(finfo.Path.ruleName(conf, toJSONRulePrefix), pkgFiles))
 	}
 
 	sort.SliceStable(res.Gen, func(i, j int) bool {
@@ -133,17 +144,17 @@ func (finfo FileInfo) newLibraryRule(name string) *rule.Rule {
 //									and together are passed to jsonnet via --ext-code-file var=file.
 // tla_code_files:		<optional>	Dict of labels referencing code files and a var name, passed to jsonnet via --tla-code-file var=file.
 // yaml_stream:			<optional>	Default: False. Set to 1 to write output as a YAML stream of JSON documents.
-func (finfo FileInfo) newToJSONRule(name string) *rule.Rule {
+func (finfo FileInfo) newToJSONRule(name string, pkgFiles map[string]bool) *rule.Rule {
 	r := rule.NewRule(toJSONRule, name)
 	r.SetAttr("src", finfo.Path.Filename)
-	// TODO(jdrios): We are prepending "_" to minimize conflicts with other packages. Example:
-	//
-	// db/data.jsonnet
-	// db/data.json
-	//
-	// ERROR: generated file 'data.json' in rule 'data_to_json' conflicts with existing source file
-	//
-	r.SetAttr("outs", []string{filepath.Join("_" + finfo.Path.Name + ".json")})
+
+	defOut, out := finfo.newOutput(".json", pkgFiles)
+	if defOut.Path != out.Path {
+		fmt.Fprintf(os.Stderr, "warning: //%s:%s should output %q, but already exists. %q was generated, instead.\n", finfo.Path.Dir, name, defOut.Filename, out.Filename)
+	}
+	pkgFiles[out.Path] = true
+	r.SetAttr("outs", []string{out.Filename})
+
 	r.SetAttr("visibility", []string{"//visibility:public"})
 
 	// We are generating jsonnet_library rules for each jsonnet file. Therefore,
@@ -151,6 +162,29 @@ func (finfo FileInfo) newToJSONRule(name string) *rule.Rule {
 	r.SetPrivateAttr(jsonnetSelfPrivateAttr, map[string]FilePath{finfo.Path.Filename: finfo.Path})
 
 	return r
+}
+
+// newOutput returns the default output and the actual output
+// If they mismatch, we had to resolve a new name because of conflicts
+func (finfo FileInfo) newOutput(ext string, pkgFiles map[string]bool) (defOut FilePath, out FilePath) {
+	defOut = newFilePath(finfo.Path.Dir, finfo.Path.Name+ext)
+	out = defOut
+	if _, found := pkgFiles[defOut.Path]; !found {
+		return
+	}
+
+	// There cannot be more than len(pkgFiles) files in the workspace
+	// so we can safely assign a number [1,len(pkgFiles)+1]
+	for i := 1; i <= len(pkgFiles)+1; i++ {
+		out = newFilePath(finfo.Path.Dir, fmt.Sprintf("%s_%d%s", finfo.Path.Name, i, ext))
+		if _, found := pkgFiles[out.Path]; !found {
+			return
+		}
+	}
+
+	// We should not reach this point.
+	// In case we do, let's return the last we computed
+	return
 }
 
 func (fpath FilePath) ruleName(conf *jsonnetConfig, prefix string) string {
