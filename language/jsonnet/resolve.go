@@ -49,10 +49,10 @@ func (*jsonnetLang) Resolve(c *config.Config, ix *resolve.RuleIndex, rc *repo.Re
 	}
 
 	conf := getJsonnetConfig(c)
-	deps := []string{}
 
 	// Data imports will be added either as labels or refs, depending on whether its
 	// directory is also a pkg or not.
+	srcs := []string{}
 	for _, fpath := range r.PrivateAttr(dataImpPrivateAttr).(map[string]FilePath) {
 		// If the rules index responds to the relative directory of the data dependency,
 		// it means that there is at least a rule belonging to a BUILD file in that
@@ -60,14 +60,21 @@ func (*jsonnetLang) Resolve(c *config.Config, ix *resolve.RuleIndex, rc *repo.Re
 		// label.
 		spec := resolve.ImportSpec{Lang: "any", Imp: fpath.Dir}
 		if matches := ix.FindRulesByImport(spec, "jsonnet"); len(matches) > 0 {
-			deps = append(deps, fpath.newDataLabel())
+			srcs = append(srcs, fpath.newDataLabel())
 			continue
 		}
 		// Otherwise, we can refer to it by a plain ref.
-		deps = append(deps, fpath.newDataRef())
+		srcs = append(srcs, fpath.newDataRef())
+	}
+
+	if len(srcs) > 0 {
+		sort.Strings(srcs)
+		// Leave self-import at the top
+		r.SetAttr("srcs", append(r.AttrStrings("srcs"), srcs...))
 	}
 
 	// Jsonnet imports will be added as labels, as they will certainly be part of a pkg
+	deps := []string{}
 	for _, fpath := range imports.(map[string]FilePath) {
 		deps = append(deps, fpath.newLabel(conf).String())
 	}

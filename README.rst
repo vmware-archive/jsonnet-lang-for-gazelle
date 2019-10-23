@@ -71,9 +71,7 @@ your repository to build a gazelle binary including the Jsonnet language.
         visibility = ["//visibility:public"],
     )
 
-    load("@jsonnet_gazelle//:def.bzl", "jsonnet_library")
-
-    # gazelle:jsonnet_allowed_imports json,sh
+    load("@io_bazel_rules_jsonnet//jsonnet:jsonnet.bzl", "jsonnet_library")
 
     gazelle(
         name = "gazelle",
@@ -94,7 +92,7 @@ You can pass additional arguments to Gazelle after a ``--`` argument.
 
 .. code::
 
-  $ bazel run //:gazelle -- -jsonnet_allowed_imports=json
+  $ bazel run //:gazelle -- -jsonnet_ignore_folders=scripts
 
 Directives
 ~~~~~~~~~~
@@ -111,9 +109,8 @@ Example
 
 .. code:: bzl
 
-  load("@jsonnet_gazelle//:def.bzl", "jsonnet_library")
+  load("@io_bazel_rules_jsonnet//jsonnet:jsonnet.bzl", "jsonnet_library")
 
-  # gazelle:jsonnet_allowed_imports json
   # gazelle:jsonnet_ignore_folders scripts
 
   gazelle(
@@ -122,7 +119,7 @@ Example
   )
 
 Directives apply in the directory where they are set *and* in subdirectories.
-This means, for example, if you set ``# gazelle:jsonnet_allowed_imports`` in the build file
+This means, for example, if you set ``# gazelle:jsonnet_ignore_folders`` in the build file
 in your project's root directory, it affects your whole project. If you
 set it in a subdirectory, it only affects rules in that subtree.
 
@@ -131,11 +128,6 @@ The following directives are recognized:
 +-----------------------------------------------------+--------------------------------------+
 | **Directive**                                       | **Default value**                    |
 +=====================================================+======================================+
-| :direc:`# gazelle:jsonnet_allowed_imports json,yaml`| none                                 |
-+-----------------------------------------------------+--------------------------------------+
-| Comma-separated list of extensions that are allowed to be imported by default.             |
-| If not specified, Gazelle will process native extensions only.                             |
-+-----------------------------------------------------+--------------------------------------+
 | :direc:`# gazelle:jsonnet_ignore_folders`           | none                                 |
 +-----------------------------------------------------+--------------------------------------+
 | Comma-separated list of folders that should not be processed. If not specified, Gazelle    |

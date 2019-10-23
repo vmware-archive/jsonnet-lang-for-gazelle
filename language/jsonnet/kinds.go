@@ -12,7 +12,7 @@ var (
 	}
 	jsonnetLoads = []rule.LoadInfo{
 		{
-			Name:    "@jsonnet_gazelle//:def.bzl",
+			Name:    "@io_bazel_rules_jsonnet//jsonnet:jsonnet.bzl",
 			Symbols: []string{"jsonnet_library"},
 		},
 	}

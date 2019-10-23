@@ -86,8 +86,6 @@ Gazelle generates rules for using those sources.
 We may generate the following rules:
 
 * ``jsonnet_library`` are generated for each of the jsonnet files found.
-* ``filegroup`` are generated for each of the non-native files that have been
-  allowed as so. See `Configuration`_.
 
 Rules are named using word characters only. Non-word characters are replaced with ``_``.
 
