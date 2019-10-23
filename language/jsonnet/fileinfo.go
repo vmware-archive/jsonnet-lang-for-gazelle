@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/bazelbuild/bazel-gazelle/language"
+	"github.com/bazelbuild/bazel-gazelle/config"
 )
 
 var (
@@ -30,11 +30,8 @@ type FileInfo struct {
 	DataImports map[string]FilePath // Data imports, from importstr
 }
 
-func jsonnetFileInfo(args language.GenerateArgs, name string) FileInfo {
-	conf := getJsonnetConfig(args.Config)
-
-	dir := args.Dir
-	rel := args.Rel
+func jsonnetFileInfo(c *config.Config, dir string, rel string, name string) FileInfo {
+	conf := getJsonnetConfig(c)
 	root := filepath.Clean(strings.TrimSuffix(dir, rel))
 	fp := FilePath{
 		Dir:      rel,
@@ -54,7 +51,7 @@ func jsonnetFileInfo(args language.GenerateArgs, name string) FileInfo {
 	}
 
 	filename := filepath.Join(rel, name)
-	content, err := ioutil.ReadFile(filename)
+	content, err := ioutil.ReadFile(filepath.Join(dir, name))
 	if err != nil {
 		log.Printf("%s: error reading file: %+v\n", filename, err)
 		return info

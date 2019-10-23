@@ -34,7 +34,7 @@ func (*jsonnetLang) GenerateRules(args language.GenerateArgs) language.GenerateR
 		if !conf.isNativeImport(filepath.Ext(name)) {
 			continue
 		}
-		finfo := jsonnetFileInfo(args, name)
+		finfo := jsonnetFileInfo(args.Config, args.Dir, args.Rel, name)
 		res.Gen = append(res.Gen, finfo.newLibraryRule(finfo.Path.ruleName(conf, libraryRulePrefix)))
 		res.Gen = append(res.Gen, finfo.newToJSONRule(finfo.Path.ruleName(conf, toJSONRulePrefix)))
 	}
