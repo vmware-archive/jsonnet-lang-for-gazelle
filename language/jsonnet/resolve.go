@@ -48,6 +48,20 @@ func (*jsonnetLang) Resolve(c *config.Config, ix *resolve.RuleIndex, rc *repo.Re
 		return
 	}
 
+	var resolveFunc func(c *config.Config, ix *resolve.RuleIndex, rc *repo.RemoteCache, r *rule.Rule, imports interface{}, from label.Label)
+	switch r.Kind() {
+	case libraryRule:
+		resolveFunc = resolveLibraryRule
+	case toJSONRule:
+		resolveFunc = resolveToJSONRule
+	}
+
+	if resolveFunc != nil {
+		resolveFunc(c, ix, rc, r, imports, from)
+	}
+}
+
+func resolveLibraryRule(c *config.Config, ix *resolve.RuleIndex, rc *repo.RemoteCache, r *rule.Rule, imports interface{}, from label.Label) {
 	conf := getJsonnetConfig(c)
 
 	// Data imports will be added either as labels or refs, depending on whether its
@@ -76,7 +90,22 @@ func (*jsonnetLang) Resolve(c *config.Config, ix *resolve.RuleIndex, rc *repo.Re
 	// Jsonnet imports will be added as labels, as they will certainly be part of a pkg
 	deps := []string{}
 	for _, fpath := range imports.(map[string]FilePath) {
-		deps = append(deps, fpath.newLabel(conf).String())
+		deps = append(deps, fpath.newLabel(conf, libraryRulePrefix).String())
+	}
+
+	r.DelAttr("deps")
+	if len(deps) > 0 {
+		sort.Strings(deps)
+		r.SetAttr("deps", deps)
+	}
+}
+
+func resolveToJSONRule(c *config.Config, ix *resolve.RuleIndex, rc *repo.RemoteCache, r *rule.Rule, imports interface{}, from label.Label) {
+	conf := getJsonnetConfig(c)
+
+	deps := []string{}
+	for _, fpath := range imports.(map[string]FilePath) {
+		deps = append(deps, fpath.newLabel(conf, libraryRulePrefix).String())
 	}
 
 	r.DelAttr("deps")
