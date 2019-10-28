@@ -28,6 +28,8 @@ load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies")
 
 gazelle_dependencies()
 
+# gazelle:repository_macro repositories.bzl%go_repositories
+
 # maintained in sync with go.mod via:
 #
 #     ./update_go_repositories.sh
