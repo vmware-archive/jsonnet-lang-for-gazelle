@@ -21,29 +21,33 @@ func (f stringFlag) String() string       { return "" }
 
 // setNativeImports implements the stringFlag type so it can be used
 // to register flags
-func (conf *jsonnetConfig) setNativeImports(extensions string) error {
+func (conf *Config) setNativeImports(extensions string) error {
 	for _, extension := range strings.Split(extensions, ",") {
 		// Ensure the extension is prefixed with a dot "."
 		conf.NativeImports["."+strings.TrimPrefix(extension, ".")] = true
 	}
 	return nil
 }
-func (conf *jsonnetConfig) isNativeImport(extension string) bool {
+
+// IsNativeImport returns whether a given extension is a native import or not
+func (conf *Config) IsNativeImport(extension string) bool {
 	return conf.NativeImports[extension]
 }
 
 // setIgnoreFolders implements the stringFlag type so it can be used
 // to register flags
-func (conf *jsonnetConfig) setIgnoreFolders(folders string) error {
+func (conf *Config) setIgnoreFolders(folders string) error {
 	for _, folder := range strings.Split(folders, ",") {
 		conf.IgnoreFolders[folder] = true
 	}
 	return nil
 }
-func (conf *jsonnetConfig) shouldIgnoreFolder(folder string) bool {
+
+// ShouldIgnoreFolder returns whether a given folder should be ignored or not
+func (conf *Config) ShouldIgnoreFolder(folder string) bool {
 	return conf.IgnoreFolders[folder]
 }
-func (conf *jsonnetConfig) registerIgnoreFoldersFlag(fs *flag.FlagSet) {
+func (conf *Config) registerIgnoreFoldersFlag(fs *flag.FlagSet) {
 	fs.Var(
 		stringFlag(conf.setIgnoreFolders),
 		ignoreFoldersDirective,

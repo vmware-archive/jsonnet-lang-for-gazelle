@@ -15,6 +15,7 @@ go_library(
     importpath = "github.com/bitnami/jsonnet-gazelle/language/jsonnet",
     visibility = ["//visibility:public"],
     deps = [
+        "//language/jsonnet/fileinfo:go_default_library",
         "@bazel_gazelle//config:go_default_library",
         "@bazel_gazelle//label:go_default_library",
         "@bazel_gazelle//language:go_default_library",
@@ -28,5 +29,8 @@ go_test(
     name = "go_default_test",
     srcs = ["fileinfo_test.go"],
     embed = [":go_default_library"],
-    deps = ["@bazel_gazelle//config:go_default_library"],
+    deps = [
+        "//language/jsonnet/fileinfo:go_default_library",
+        "@bazel_gazelle//config:go_default_library",
+    ],
 )

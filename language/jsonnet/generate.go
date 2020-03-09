@@ -4,13 +4,11 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"regexp"
 	"sort"
-	"strings"
 
-	"github.com/bazelbuild/bazel-gazelle/label"
 	"github.com/bazelbuild/bazel-gazelle/language"
 	"github.com/bazelbuild/bazel-gazelle/rule"
+	"github.com/bitnami/jsonnet-gazelle/language/jsonnet/fileinfo"
 )
 
 const (
@@ -19,15 +17,12 @@ const (
 	jsonnetSelfPrivateAttr = "_jsonnet_self"
 )
 
-var (
-	ruleRe = regexp.MustCompile(`[^\w]+`)
-)
-
-func (*jsonnetLang) GenerateRules(args language.GenerateArgs) language.GenerateResult {
+// GenerateRules implements language.Language
+func (l *Lang) GenerateRules(args language.GenerateArgs) language.GenerateResult {
 	var res language.GenerateResult
 
-	conf := getJsonnetConfig(args.Config)
-	if conf.shouldIgnoreFolder(args.Rel) {
+	conf := GetConfig(args.Config)
+	if conf.ShouldIgnoreFolder(args.Rel) {
 		return res
 	}
 
@@ -42,12 +37,12 @@ func (*jsonnetLang) GenerateRules(args language.GenerateArgs) language.GenerateR
 	}
 
 	for _, name := range args.RegularFiles {
-		if !conf.isNativeImport(filepath.Ext(name)) {
+		if !conf.IsNativeImport(filepath.Ext(name)) {
 			continue
 		}
-		finfo := jsonnetFileInfo(args.Config, args.Dir, args.Rel, name)
-		res.Gen = append(res.Gen, finfo.newLibraryRule(finfo.Path.ruleName(conf, libraryRulePrefix)))
-		res.Gen = append(res.Gen, finfo.newToJSONRule(finfo.Path.ruleName(conf, toJSONRulePrefix), pkgFiles))
+		finfo := l.FileInfoFunc(args.Config, args.Dir, args.Rel, name)
+		res.Gen = append(res.Gen, newLibraryRule(finfo))
+		res.Gen = append(res.Gen, newToJSONRule(finfo, pkgFiles))
 	}
 
 	sort.SliceStable(res.Gen, func(i, j int) bool {
@@ -88,20 +83,21 @@ func (*jsonnetLang) GenerateRules(args language.GenerateArgs) language.GenerateR
 // This rule implementation will not generate (yet) rules with:
 //
 // imports: <optional> List of import -J flags to be passed to the jsonnet compiler.
-func (finfo FileInfo) newLibraryRule(name string) *rule.Rule {
+func newLibraryRule(finfo fileinfo.FileInfo) *rule.Rule {
+	name := finfo.Path.RuleName(libraryRulePrefix)
 	r := rule.NewRule(libraryRule, name)
 	r.SetAttr("srcs", []string{finfo.Path.Filename})
 	r.SetAttr("visibility", []string{"//visibility:public"})
 
 	// Mark jsonnet imports
-	imports := make(map[string]FilePath, len(finfo.Imports))
+	imports := make(map[string]fileinfo.FilePath, len(finfo.Imports))
 	for imp, fpath := range finfo.Imports {
 		imports[imp] = fpath
 	}
 	r.SetPrivateAttr(jsonnetImpPrivateAttr, imports)
 
 	// Mark data imports
-	dataImports := make(map[string]FilePath, len(finfo.DataImports))
+	dataImports := make(map[string]fileinfo.FilePath, len(finfo.DataImports))
 	for imp, fpath := range finfo.DataImports {
 		dataImports[imp] = fpath
 	}
@@ -144,11 +140,12 @@ func (finfo FileInfo) newLibraryRule(name string) *rule.Rule {
 //									and together are passed to jsonnet via --ext-code-file var=file.
 // tla_code_files:		<optional>	Dict of labels referencing code files and a var name, passed to jsonnet via --tla-code-file var=file.
 // yaml_stream:			<optional>	Default: False. Set to 1 to write output as a YAML stream of JSON documents.
-func (finfo FileInfo) newToJSONRule(name string, pkgFiles map[string]bool) *rule.Rule {
+func newToJSONRule(finfo fileinfo.FileInfo, pkgFiles map[string]bool) *rule.Rule {
+	name := finfo.Path.RuleName(toJSONRulePrefix)
 	r := rule.NewRule(toJSONRule, name)
 	r.SetAttr("src", finfo.Path.Filename)
 
-	defOut, out := finfo.newOutput(".json", pkgFiles)
+	defOut, out := newOutput(finfo, ".json", pkgFiles)
 	if defOut.Path != out.Path {
 		fmt.Fprintf(os.Stderr, "warning: //%s:%s should output %q, but already exists. %q was generated, instead.\n", finfo.Path.Dir, name, defOut.Filename, out.Filename)
 	}
@@ -159,15 +156,15 @@ func (finfo FileInfo) newToJSONRule(name string, pkgFiles map[string]bool) *rule
 
 	// We are generating jsonnet_library rules for each jsonnet file. Therefore,
 	// we can use the file's own jsonnet_library rule as only dependency.
-	r.SetPrivateAttr(jsonnetSelfPrivateAttr, map[string]FilePath{finfo.Path.Filename: finfo.Path})
+	r.SetPrivateAttr(jsonnetSelfPrivateAttr, map[string]fileinfo.FilePath{finfo.Path.Filename: finfo.Path})
 
 	return r
 }
 
 // newOutput returns the default output and the actual output
 // If they mismatch, we had to resolve a new name because of conflicts
-func (finfo FileInfo) newOutput(ext string, pkgFiles map[string]bool) (defOut FilePath, out FilePath) {
-	defOut = newFilePath(finfo.Path.Dir, finfo.Path.Name+ext)
+func newOutput(finfo fileinfo.FileInfo, ext string, pkgFiles map[string]bool) (defOut fileinfo.FilePath, out fileinfo.FilePath) {
+	defOut = fileinfo.NewFilePath(finfo.Path.Dir, finfo.Path.Name+ext)
 	out = defOut
 	if _, found := pkgFiles[defOut.Path]; !found {
 		return
@@ -176,7 +173,7 @@ func (finfo FileInfo) newOutput(ext string, pkgFiles map[string]bool) (defOut Fi
 	// There cannot be more than len(pkgFiles) files in the workspace
 	// so we can safely assign a number [1,len(pkgFiles)+1]
 	for i := 1; i <= len(pkgFiles)+1; i++ {
-		out = newFilePath(finfo.Path.Dir, fmt.Sprintf("%s_%d%s", finfo.Path.Name, i, ext))
+		out = fileinfo.NewFilePath(finfo.Path.Dir, fmt.Sprintf("%s_%d%s", finfo.Path.Name, i, ext))
 		if _, found := pkgFiles[out.Path]; !found {
 			return
 		}
@@ -185,24 +182,4 @@ func (finfo FileInfo) newOutput(ext string, pkgFiles map[string]bool) (defOut Fi
 	// We should not reach this point.
 	// In case we do, let's return the last we computed
 	return
-}
-
-func (fpath FilePath) ruleName(conf *jsonnetConfig, prefix string) string {
-	str := fpath.Name
-	str = strings.ToLower(str)
-	// Replace non [a-zA-Z0-9_] characters with "_"
-	str = ruleRe.ReplaceAllString(str, "_")
-	return str + "_" + prefix
-}
-
-func (fpath FilePath) newLabel(conf *jsonnetConfig, prefix string) label.Label {
-	return label.New("", fpath.Dir, fpath.ruleName(conf, prefix))
-}
-
-func (fpath FilePath) newDataRef() string {
-	return fmt.Sprintf("//:%s", fpath.Path)
-}
-
-func (fpath FilePath) newDataLabel() string {
-	return fmt.Sprintf("//%s:%s", fpath.Dir, fpath.Filename)
 }

@@ -8,13 +8,14 @@ import (
 	"github.com/bazelbuild/bazel-gazelle/rule"
 )
 
-type jsonnetConfig struct {
+// Config states the jsonnet configuration
+type Config struct {
 	NativeImports map[string]bool
 	IgnoreFolders map[string]bool
 }
 
-func newJsonnetConfig() *jsonnetConfig {
-	conf := &jsonnetConfig{
+func newConfig() *Config {
+	conf := &Config{
 		NativeImports: make(map[string]bool, len(nativeImports)),
 		IgnoreFolders: make(map[string]bool),
 	}
@@ -22,18 +23,19 @@ func newJsonnetConfig() *jsonnetConfig {
 	return conf
 }
 
-func getJsonnetConfig(c *config.Config) *jsonnetConfig {
+// GetConfig returns a new Config within jsonnet-specs
+func GetConfig(c *config.Config) *Config {
 	conf := c.Exts[languageName]
 	if conf == nil {
-		conf = newJsonnetConfig()
-		return conf.(*jsonnetConfig)
+		conf = newConfig()
+		return conf.(*Config)
 	}
-	return conf.(*jsonnetConfig)
+	return conf.(*Config)
 }
 
-func (*jsonnetLang) CheckFlags(fs *flag.FlagSet, c *config.Config) error { return nil }
-func (*jsonnetLang) Configure(c *config.Config, rel string, f *rule.File) {
-	conf := getJsonnetConfig(c)
+func (*Lang) CheckFlags(fs *flag.FlagSet, c *config.Config) error { return nil }
+func (*Lang) Configure(c *config.Config, rel string, f *rule.File) {
+	conf := GetConfig(c)
 
 	if f != nil {
 		for _, d := range f.Directives {
@@ -44,13 +46,13 @@ func (*jsonnetLang) Configure(c *config.Config, rel string, f *rule.File) {
 		}
 	}
 }
-func (*jsonnetLang) KnownDirectives() []string {
+func (*Lang) KnownDirectives() []string {
 	return []string{
 		ignoreFoldersDirective,
 	}
 }
-func (*jsonnetLang) RegisterFlags(fs *flag.FlagSet, cmd string, c *config.Config) {
-	conf := getJsonnetConfig(c)
+func (*Lang) RegisterFlags(fs *flag.FlagSet, cmd string, c *config.Config) {
+	conf := GetConfig(c)
 	switch cmd {
 	case "fix", "update", "update-repos":
 		conf.registerIgnoreFoldersFlag(fs)

@@ -46,7 +46,7 @@ below. Each of the steps here is described in more detail in the sections below.
 Configuration
 -------------
 
-Gazelle for Jsonnet stores configuration information in ``jsonnetConfig`` objects. These objects
+Gazelle for Jsonnet stores configuration information in ``Config`` objects. These objects
 contain settings that affect the behavior of the program.
 For example:
 
@@ -54,8 +54,8 @@ For example:
 * A list of native imports (``.jsonnet``, ``.libsonnet``).
 * A list of folders to ignore (the ``BUILD.bazel`` won't be modified).
 
-``jsonnetConfig`` objects apply to individual directories. Each directory inherits
-the ``jsonnetConfig`` from its parent. Values in a ``jsonnetConfig`` may be modified within
+``Config`` objects apply to individual directories. Each directory inherits
+the ``Config`` from its parent. Values in a ``Config`` may be modified within
 a directory using *directives* written in the directory's build file. A
 directive is a special comment formatted like this:
 

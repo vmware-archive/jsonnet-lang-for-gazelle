@@ -1,0 +1,9 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "go_default_library",
+    srcs = ["fileinfo.go"],
+    importpath = "github.com/bitnami/jsonnet-gazelle/language/jsonnet/fileinfo",
+    visibility = ["//visibility:public"],
+    deps = ["@bazel_gazelle//label:go_default_library"],
+)

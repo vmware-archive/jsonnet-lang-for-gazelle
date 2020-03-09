@@ -20,14 +20,19 @@
 package jsonnet
 
 import (
+	"github.com/bazelbuild/bazel-gazelle/config"
 	"github.com/bazelbuild/bazel-gazelle/language"
+	"github.com/bitnami/jsonnet-gazelle/language/jsonnet/fileinfo"
 )
 
 const (
 	languageName = "jsonnet"
 )
 
-type jsonnetLang struct{}
+// Lang implements language.Language
+type Lang struct {
+	FileInfoFunc func(c *config.Config, dir string, rel string, name string) fileinfo.FileInfo
+}
 
 // NewLanguage implements the language.Language interface
-func NewLanguage() language.Language { return &jsonnetLang{} }
+func NewLanguage() language.Language { return &Lang{FileInfoFunc: NewFileInfo} }

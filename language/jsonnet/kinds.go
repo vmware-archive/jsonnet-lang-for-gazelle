@@ -41,5 +41,5 @@ var (
 	}
 )
 
-func (*jsonnetLang) Kinds() map[string]rule.KindInfo { return jsonnetKinds }
-func (*jsonnetLang) Loads() []rule.LoadInfo          { return jsonnetLoads }
+func (*Lang) Kinds() map[string]rule.KindInfo { return jsonnetKinds }
+func (*Lang) Loads() []rule.LoadInfo          { return jsonnetLoads }

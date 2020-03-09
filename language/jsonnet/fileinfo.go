@@ -8,38 +8,24 @@ import (
 	"strings"
 
 	"github.com/bazelbuild/bazel-gazelle/config"
+	"github.com/bitnami/jsonnet-gazelle/language/jsonnet/fileinfo"
 )
 
 var (
 	jsonnetRe = buildJsonnetRegexp()
 )
 
-// FilePath contains the path information for a file
-type FilePath struct {
-	Dir      string // Relative directory to the root of the code base; it works as pkg ref
-	Ext      string // File name extension
-	Filename string // File name
-	Name     string // File name, without extension
-	Path     string // File path, relative to the root of the code base
-}
-
-// FileInfo contains metadata extracted from a file
-type FileInfo struct {
-	Path        FilePath            // File path information
-	Imports     map[string]FilePath // Jsonnet imports, from import
-	DataImports map[string]FilePath // Data imports, from importstr
-}
-
-func jsonnetFileInfo(c *config.Config, dir string, rel string, name string) FileInfo {
-	conf := getJsonnetConfig(c)
+// NewFileInfo returns a FileInfo from a file path information
+func NewFileInfo(c *config.Config, dir string, rel string, name string) fileinfo.FileInfo {
+	conf := GetConfig(c)
 	root := filepath.Clean(strings.TrimSuffix(dir, rel))
-	info := FileInfo{
-		Path:        newFilePath(rel, name),
-		Imports:     make(map[string]FilePath),
-		DataImports: make(map[string]FilePath),
+	info := fileinfo.FileInfo{
+		Path:        fileinfo.NewFilePath(rel, name),
+		Imports:     make(map[string]fileinfo.FilePath),
+		DataImports: make(map[string]fileinfo.FilePath),
 	}
 
-	if !conf.isNativeImport(info.Path.Ext) {
+	if !conf.IsNativeImport(info.Path.Ext) {
 		return info
 	}
 
@@ -58,7 +44,7 @@ func jsonnetFileInfo(c *config.Config, dir string, rel string, name string) File
 			impFp := resolveFilePath(root, impPath)
 			ext := filepath.Ext(imp)
 
-			if !conf.isNativeImport(ext) {
+			if !conf.IsNativeImport(ext) {
 				// Raw JSON can be imported this way too.
 				if ext == ".json" {
 					// We should handle this import as a data import, though
@@ -101,22 +87,9 @@ func buildJsonnetRegexp() *regexp.Regexp {
 	return regexp.MustCompile(jsonnetReSrc)
 }
 
-func resolveFilePath(root string, file string) FilePath {
+func resolveFilePath(root string, file string) fileinfo.FilePath {
 	filedir := filepath.Dir(file)
 	dir := strings.TrimPrefix(strings.TrimPrefix(filedir, root), "/")
 	filename := filepath.Base(file)
-	return newFilePath(dir, filename)
-}
-
-func newFilePath(dir string, file string) FilePath {
-	ext := filepath.Ext(file)
-	name := strings.TrimSuffix(file, ext)
-	fp := FilePath{
-		Dir:      dir,
-		Ext:      ext,
-		Filename: file,
-		Name:     name,
-		Path:     filepath.Join(dir, file),
-	}
-	return fp
+	return fileinfo.NewFilePath(dir, filename)
 }
