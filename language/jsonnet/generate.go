@@ -2,7 +2,6 @@ package jsonnet
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 	"sort"
 
@@ -145,12 +144,8 @@ func newToJSONRule(finfo fileinfo.FileInfo, pkgFiles map[string]bool) *rule.Rule
 	r := rule.NewRule(toJSONRule, name)
 	r.SetAttr("src", finfo.Path.Filename)
 
-	defOut, out := newOutput(finfo, ".json", pkgFiles)
-	if defOut.Path != out.Path {
-		fmt.Fprintf(os.Stderr, "warning: //%s:%s should output %q, but already exists. %q was generated, instead.\n", finfo.Path.Dir, name, defOut.Filename, out.Filename)
-	}
-	pkgFiles[out.Path] = true
-	r.SetAttr("outs", []string{out.Filename})
+	path := newOutput(finfo, ".json", pkgFiles)
+	r.SetAttr("outs", []string{filepath.Base(path)})
 
 	r.SetAttr("visibility", []string{"//visibility:public"})
 
@@ -161,25 +156,28 @@ func newToJSONRule(finfo fileinfo.FileInfo, pkgFiles map[string]bool) *rule.Rule
 	return r
 }
 
-// newOutput returns the default output and the actual output
-// If they mismatch, we had to resolve a new name because of conflicts
-func newOutput(finfo fileinfo.FileInfo, ext string, pkgFiles map[string]bool) (defOut fileinfo.FilePath, out fileinfo.FilePath) {
-	defOut = fileinfo.NewFilePath(finfo.Path.Dir, finfo.Path.Name+ext)
-	out = defOut
-	if _, found := pkgFiles[defOut.Path]; !found {
-		return
+// newOutput returns an output path for the given FileInfo and extension.
+//
+// If the output path already exists in the workspace or is an declared output of an existing rule,
+// it generates a new name using <name>_X.<ext> format.
+func newOutput(finfo fileinfo.FileInfo, ext string, pkgFiles map[string]bool) string {
+	path := filepath.Join(finfo.Path.Package, finfo.Path.Name+ext)
+	if _, found := pkgFiles[path]; !found {
+		// Mark as used
+		pkgFiles[path] = true
+		return path
 	}
 
 	// There cannot be more than len(pkgFiles) files in the workspace
 	// so we can safely assign a number [1,len(pkgFiles)+1]
 	for i := 1; i <= len(pkgFiles)+1; i++ {
-		out = fileinfo.NewFilePath(finfo.Path.Dir, fmt.Sprintf("%s_%d%s", finfo.Path.Name, i, ext))
-		if _, found := pkgFiles[out.Path]; !found {
-			return
+		path = filepath.Join(finfo.Path.Package, fmt.Sprintf("%s_%d%s", finfo.Path.Name, i, ext))
+		// Mark as used
+		if _, found := pkgFiles[path]; !found {
+			pkgFiles[path] = true
+			break
 		}
 	}
 
-	// We should not reach this point.
-	// In case we do, let's return the last we computed
-	return
+	return path
 }

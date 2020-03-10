@@ -71,7 +71,7 @@ func resolveLibraryRule(ix *resolve.RuleIndex, rc *repo.RemoteCache, r *rule.Rul
 		// it means that there is at least a rule belonging to a BUILD file in that
 		// directory. In that case, we should refer to the data dependency by its
 		// label.
-		spec := resolve.ImportSpec{Lang: "any", Imp: fpath.Dir}
+		spec := resolve.ImportSpec{Lang: "any", Imp: fpath.Package}
 		if matches := ix.FindRulesByImport(spec, "jsonnet"); len(matches) > 0 {
 			srcs = append(srcs, fpath.NewDataLabel())
 			continue

@@ -97,3 +97,27 @@ def go_repositories():
         sum = "h1:FkAkwuYWQw+IArrnmhGlisKHQF4MsZ2Nu/fX4ttW55o=",
         version = "v0.0.0-20190122202912-9c309ee22fab",
     )
+    go_repository(
+        name = "com_github_juju_errors",
+        importpath = "github.com/juju/errors",
+        sum = "h1:hJix6idebFclqlfZCHE7EUX7uqLCyb70nHNHH1XKGBg=",
+        version = "v0.0.0-20190930114154-d42613fe1ab9",
+    )
+    go_repository(
+        name = "com_github_juju_loggo",
+        importpath = "github.com/juju/loggo",
+        sum = "h1:UUHMLvzt/31azWTN/ifGWef4WUqvXk0iRqdhdy/2uzI=",
+        version = "v0.0.0-20190526231331-6e530bcce5d8",
+    )
+    go_repository(
+        name = "com_github_juju_testing",
+        importpath = "github.com/juju/testing",
+        sum = "h1:Rrp0ByJXEjhREMPGTt3aWYjoIsUGCbt21ekbeJcTWv0=",
+        version = "v0.0.0-20191001232224-ce9dec17d28b",
+    )
+    go_repository(
+        name = "in_gopkg_mgo_v2",
+        importpath = "gopkg.in/mgo.v2",
+        sum = "h1:VpOs+IwYnYBaFnrNAeB8UUWtL3vEUnzSCL1nVjPhqrw=",
+        version = "v2.0.0-20190816093944-a6b53ec6cb22",
+    )
