@@ -5,10 +5,7 @@ go_library(
     srcs = ["fileinfo.go"],
     importpath = "github.com/bitnami/jsonnet-gazelle/language/jsonnet/fileinfo",
     visibility = ["//visibility:public"],
-    deps = [
-        "@bazel_gazelle//label:go_default_library",
-        "@com_github_juju_errors//:go_default_library",
-    ],
+    deps = ["@bazel_gazelle//label:go_default_library"],
 )
 
 go_test(

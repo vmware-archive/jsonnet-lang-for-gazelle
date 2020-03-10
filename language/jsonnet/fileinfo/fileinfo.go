@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/bazelbuild/bazel-gazelle/label"
-	"github.com/juju/errors"
 )
 
 var (
@@ -80,7 +79,7 @@ func NewFilePath(root string, elem ...string) (FilePath, error) {
 	if filepath.IsAbs(path) {
 		p, err := filepath.Rel(root, path)
 		if err != nil {
-			return FilePath{}, errors.Trace(err)
+			return FilePath{}, err
 		}
 		path = p
 	}

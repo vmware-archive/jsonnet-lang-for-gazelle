@@ -10,7 +10,6 @@ import (
 
 	"github.com/bazelbuild/bazel-gazelle/config"
 	"github.com/bitnami/jsonnet-gazelle/language/jsonnet/fileinfo"
-	"github.com/juju/errors"
 )
 
 var (
@@ -56,11 +55,11 @@ func addImports(conf *Config, info *fileinfo.FileInfo, path fileinfo.FilePath) e
 		case match[importSubexpIndex] != nil:
 			importAbsPath, err := NormalizeImport(path, string(match[importSubexpIndex]))
 			if err != nil {
-				return errors.Trace(err)
+				return err
 			}
 			importPath, err := fileinfo.NewFilePath(path.Root, importAbsPath)
 			if err != nil {
-				return errors.Trace(err)
+				return err
 			}
 
 			if !conf.IsNativeImport(importPath.Ext) {
@@ -71,7 +70,7 @@ func addImports(conf *Config, info *fileinfo.FileInfo, path fileinfo.FilePath) e
 					continue
 				}
 
-				return errors.Errorf("%s: unknown %s extension for the `import` construct.", importPath.Filename, importPath.Ext)
+				return fmt.Errorf("unknown %s extension for the `import` construct in %q", importPath.Ext, importPath.Filename)
 			}
 
 			info.Imports[importPath.Path] = importPath
@@ -79,11 +78,11 @@ func addImports(conf *Config, info *fileinfo.FileInfo, path fileinfo.FilePath) e
 		case match[importstrSubexpIndex] != nil:
 			importAbsPath, err := NormalizeImport(path, string(match[importstrSubexpIndex]))
 			if err != nil {
-				return errors.Trace(err)
+				return err
 			}
 			importPath, err := fileinfo.NewFilePath(path.Root, importAbsPath)
 			if err != nil {
-				return errors.Trace(err)
+				return err
 			}
 
 			info.DataImports[importPath.Path] = importPath
@@ -101,7 +100,7 @@ func addImports(conf *Config, info *fileinfo.FileInfo, path fileinfo.FilePath) e
 func NormalizeImport(path fileinfo.FilePath, importstr string) (string, error) {
 	if filepath.IsAbs(importstr) {
 		if !strings.HasSuffix(importstr, path.Root) {
-			return "", errors.Errorf("%q cannot be normalized. It is out of the root of the project %q", importstr, path.Root)
+			return "", fmt.Errorf("cannot normalize %q. It is out of the root of the project %q", importstr, path.Root)
 		}
 		return importstr, nil
 	}
