@@ -8,6 +8,7 @@ go_library(
         "fileinfo.go",
         "fix.go",
         "generate.go",
+        "importer.go",
         "kinds.go",
         "lang.go",
         "resolve.go",
@@ -22,15 +23,22 @@ go_library(
         "@bazel_gazelle//repo:go_default_library",
         "@bazel_gazelle//resolve:go_default_library",
         "@bazel_gazelle//rule:go_default_library",
+        "@com_github_google_go_jsonnet//:go_default_library",
+        "@com_github_google_go_jsonnet//ast:go_default_library",
+        "@com_github_google_go_jsonnet//toolutils:go_default_library",
     ],
 )
 
 go_test(
     name = "go_default_test",
-    srcs = ["fileinfo_test.go"],
+    srcs = [
+        "fileinfo_test.go",
+        "importer_test.go",
+    ],
     embed = [":go_default_library"],
     deps = [
         "//language/jsonnet/fileinfo:go_default_library",
         "@bazel_gazelle//config:go_default_library",
+        "@com_github_google_go_jsonnet//:go_default_library",
     ],
 )

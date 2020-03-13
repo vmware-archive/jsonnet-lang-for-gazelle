@@ -2,6 +2,7 @@ package jsonnet
 
 import (
 	"fmt"
+	"log"
 	"path/filepath"
 	"sort"
 
@@ -39,9 +40,16 @@ func (l *Lang) GenerateRules(args language.GenerateArgs) language.GenerateResult
 		if !conf.IsNativeImport(filepath.Ext(name)) {
 			continue
 		}
-		finfo := l.FileInfoFunc(args.Config, args.Dir, args.Rel, name)
-		res.Gen = append(res.Gen, newLibraryRule(finfo))
-		res.Gen = append(res.Gen, newToJSONRule(finfo, pkgFiles))
+		finfo, err := NewFileInfo(args.Config, args.Dir, args.Rel, name, &Importer{l.Importer})
+		if err != nil {
+			log.Printf("%v", err)
+			continue
+		}
+		if finfo == nil {
+			continue
+		}
+		res.Gen = append(res.Gen, newLibraryRule(*finfo))
+		res.Gen = append(res.Gen, newToJSONRule(*finfo, pkgFiles))
 	}
 
 	sort.SliceStable(res.Gen, func(i, j int) bool {

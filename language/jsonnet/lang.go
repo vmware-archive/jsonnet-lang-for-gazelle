@@ -20,9 +20,8 @@
 package jsonnet
 
 import (
-	"github.com/bazelbuild/bazel-gazelle/config"
 	"github.com/bazelbuild/bazel-gazelle/language"
-	"github.com/bitnami/jsonnet-gazelle/language/jsonnet/fileinfo"
+	"github.com/google/go-jsonnet"
 )
 
 const (
@@ -31,8 +30,13 @@ const (
 
 // Lang implements language.Language
 type Lang struct {
-	FileInfoFunc func(c *config.Config, dir string, rel string, name string) fileinfo.FileInfo
+	// Importer hooks a jsonnet.Importer to implement a jsonnet AST parser.
+	Importer jsonnet.Importer
 }
 
 // NewLanguage implements the language.Language interface
-func NewLanguage() language.Language { return &Lang{FileInfoFunc: NewFileInfo} }
+func NewLanguage() language.Language {
+	return &Lang{
+		Importer: &jsonnet.FileImporter{},
+	}
+}

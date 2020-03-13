@@ -1,6 +1,23 @@
 load("@bazel_gazelle//:deps.bzl", "go_repository")
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 def go_repositories():
+    # go-jsonnet has a submodule which is not currently supported by gazelle.
+    #
+    # This gazelle directive prevents gazelle from generating its own go_repository rule for this
+    #
+    # gazelle:repository go_repository name=com_github_google_go_jsonnet importpath=github.com/google/go-jsonnet
+    git_repository(
+        name = "com_github_google_go_jsonnet",
+        init_submodules = True,
+        remote = "https://github.com/google/go-jsonnet",
+        # Canonical reproducible form for tag = "v0.15.0",
+        commit = "70a6b3d419d9ee16a144345c35e0305052c6f2d9",
+        shallow_since = "1581289066 +0100",
+    )
+
+    # automatically added by gazelle
+
     go_repository(
         name = "com_github_bazelbuild_bazel_gazelle",
         importpath = "github.com/bazelbuild/bazel-gazelle",
@@ -88,8 +105,8 @@ def go_repositories():
     go_repository(
         name = "org_golang_x_sys",
         importpath = "golang.org/x/sys",
-        sum = "h1:Lk4tbZFnlyPgV+sLgTw5yGfzrlOn9kx4vSombi2FFlY=",
-        version = "v0.0.0-20190122071731-054c452bb702",
+        sum = "h1:T5DasATyLQfmbTpfEXx/IOL9vfjzW6up+ZDkmHvIf2s=",
+        version = "v0.0.0-20190531175056-4c3a928424d2",
     )
     go_repository(
         name = "org_golang_x_tools",
@@ -120,4 +137,40 @@ def go_repositories():
         importpath = "gopkg.in/mgo.v2",
         sum = "h1:VpOs+IwYnYBaFnrNAeB8UUWtL3vEUnzSCL1nVjPhqrw=",
         version = "v2.0.0-20190816093944-a6b53ec6cb22",
+    )
+    go_repository(
+        name = "com_github_fatih_color",
+        importpath = "github.com/fatih/color",
+        sum = "h1:DkWD4oS2D8LGGgTQ6IvwJJXSL5Vp2ffcQg58nFV38Ys=",
+        version = "v1.7.0",
+    )
+    go_repository(
+        name = "com_github_mattn_go_colorable",
+        importpath = "github.com/mattn/go-colorable",
+        sum = "h1:G1f5SKeVxmagw/IyvzvtZE4Gybcc4Tr1tf7I8z0XgOg=",
+        version = "v0.1.1",
+    )
+    go_repository(
+        name = "com_github_mattn_go_isatty",
+        importpath = "github.com/mattn/go-isatty",
+        sum = "h1:UvyT9uN+3r7yLEYSlJsbQGdsaB/a0DlgWP3pql6iwOc=",
+        version = "v0.0.7",
+    )
+    go_repository(
+        name = "com_github_sergi_go_diff",
+        importpath = "github.com/sergi/go-diff",
+        sum = "h1:Kpca3qRNrduNnOQeazBd0ysaKrUJiIuISHxogkT9RPQ=",
+        version = "v1.0.0",
+    )
+    go_repository(
+        name = "com_github_stretchr_objx",
+        importpath = "github.com/stretchr/objx",
+        sum = "h1:4G4v2dO3VZwixGIRoQ5Lfboy6nUhCyYzaqnIAPPhYs4=",
+        version = "v0.1.0",
+    )
+    go_repository(
+        name = "com_github_stretchr_testify",
+        importpath = "github.com/stretchr/testify",
+        sum = "h1:TivCn/peBQ7UY8ooIcPgZFpTNSz0Q2U6UrFlUfqbe0Q=",
+        version = "v1.3.0",
     )

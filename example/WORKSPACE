@@ -40,6 +40,10 @@ local_repository(
     path = "..",
 )
 
+load("@jsonnet_gazelle//:repositories.bzl", "go_repositories")
+
+go_repositories()
+
 http_archive(
     name = "io_bazel_rules_jsonnet",
     sha256 = "68b5bcb0779599065da1056fc8df60d970cffe8e6832caf13819bb4d6e832459",
