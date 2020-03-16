@@ -1,6 +1,7 @@
 package jsonnet_test
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -168,22 +169,24 @@ func TestNormalizeImport(t *testing.T) {
 	path := fileinfo.FilePath{Root: "/root", Package: "ws"}
 	testCases := []struct {
 		importstr, want string
-		wantE           error
+		// The error message does not have to match the expected one but
+		// it must implement the error type.
+		wantE error
 	}{
 		// good cases
 		{"a.jsonnet", "/root/ws/a.jsonnet", nil},
 		{"../a.jsonnet", "/root/a.jsonnet", nil},
 		{"/root/a.jsonnet", "/root/a.jsonnet", nil},
 		// wrong cases
-		{"/var/a.jsonnet", "", jsonnet.OutOfWorkspaceError("/var/a.jsonnet").Error()},
-		{"../../a.jsonnet", "", jsonnet.OutOfWorkspaceError("../../a.jsonnet").Error()},
+		{"/var/a.jsonnet", "", jsonnet.OutOfWorkspaceError("")},
+		{"../../a.jsonnet", "", jsonnet.OutOfWorkspaceError("")},
 	}
 
 	for _, tc := range testCases {
 		t.Run(fmt.Sprintf("%s to %s", tc.importstr, tc.want), func(t *testing.T) {
 			got, err := jsonnet.NormalizeImport(path, tc.importstr)
 			if tc.wantE != nil {
-				if tc.wantE.Error() != err.Error() {
+				if !errors.Is(err, tc.wantE) {
 					t.Errorf("got %v; want %v", err, tc.wantE)
 				}
 				return

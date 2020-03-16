@@ -56,8 +56,14 @@ func NewFileInfo(c *config.Config, dir string, rel string, name string, importer
 // OutOfWorkspaceError defines a typed error for this specific case
 type OutOfWorkspaceError string
 
-func (s OutOfWorkspaceError) Error() error {
-	return fmt.Errorf("cannot normalize %q: it is out of the root of the project", s)
+func (e OutOfWorkspaceError) Error() string {
+	return fmt.Sprintf("cannot normalize %q: it is out of the root of the workspace", string(e))
+}
+
+// Is implements errors.Is
+func (e OutOfWorkspaceError) Is(t error) bool {
+	_, ok := t.(OutOfWorkspaceError)
+	return ok
 }
 
 // NormalizeImport normalizes an import string to be absolute, in any case.
@@ -65,13 +71,13 @@ func (s OutOfWorkspaceError) Error() error {
 func NormalizeImport(path fileinfo.FilePath, importstr string) (string, error) {
 	if filepath.IsAbs(importstr) {
 		if !strings.HasPrefix(importstr, path.Root) {
-			return "", OutOfWorkspaceError(importstr).Error()
+			return "", OutOfWorkspaceError(importstr)
 		}
 		return importstr, nil
 	}
 	joined := path.Join(importstr)
 	if !strings.HasPrefix(joined, path.Root) {
-		return "", OutOfWorkspaceError(importstr).Error()
+		return "", OutOfWorkspaceError(importstr)
 	}
 	return joined, nil
 }
