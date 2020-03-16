@@ -1,6 +1,8 @@
 package jsonnet_test
 
 import (
+	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -158,6 +160,41 @@ func TestJsonnetFileInfo(t *testing.T) {
 			normalizeFileInfo(got)
 			if !reflect.DeepEqual(got, tc.want) {
 				t.Errorf("got %#v; want %#v", got, tc.want)
+			}
+		})
+	}
+}
+
+func TestNormalizeImport(t *testing.T) {
+	path := fileinfo.FilePath{Root: "/root", Package: "ws"}
+	testCases := []struct {
+		importstr, want string
+		// The match is performed with errors.Is, which honours the optional Is method if present.
+		wantE error
+	}{
+		// good cases
+		{"a.jsonnet", "/root/ws/a.jsonnet", nil},
+		{"../a.jsonnet", "/root/a.jsonnet", nil},
+		{"/root/a.jsonnet", "/root/a.jsonnet", nil},
+		// wrong cases
+		{"/var/a.jsonnet", "", jsonnet.OutOfWorkspaceError("")},
+		{"../../a.jsonnet", "", jsonnet.OutOfWorkspaceError("")},
+	}
+
+	for _, tc := range testCases {
+		t.Run(fmt.Sprintf("%s to %s", tc.importstr, tc.want), func(t *testing.T) {
+			got, err := jsonnet.NormalizeImport(path, tc.importstr)
+			if tc.wantE != nil {
+				if !errors.Is(err, tc.wantE) {
+					t.Errorf("got %v; want %v", err, tc.wantE)
+				}
+				return
+			}
+			if err != nil {
+				t.Fatal(err)
+			}
+			if tc.want != got {
+				t.Errorf("got %q; want %q", got, tc.want)
 			}
 		})
 	}
