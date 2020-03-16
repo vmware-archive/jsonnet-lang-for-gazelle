@@ -169,8 +169,7 @@ func TestNormalizeImport(t *testing.T) {
 	path := fileinfo.FilePath{Root: "/root", Package: "ws"}
 	testCases := []struct {
 		importstr, want string
-		// The error message does not have to match the expected one but
-		// it must implement the error type.
+		// The match is performed with errors.Is, which honours the optional Is method if present.
 		wantE error
 	}{
 		// good cases
