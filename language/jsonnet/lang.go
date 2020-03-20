@@ -1,3 +1,6 @@
+// Copyright 2019 VMware, Inc.
+// SPDX-License-Identifier: Apache-2.0
+
 // Package jsonnet provides support for jsonnet rules.
 // It generates jsonnet_library rules.
 //
