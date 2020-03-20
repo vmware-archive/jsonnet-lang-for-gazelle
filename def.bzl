@@ -1,3 +1,6 @@
+// Copyright 2019 VMware, Inc.
+// SPDX-License-Identifier: Apache-2.0
+
 """Jsonnet library. It is a wrapper on top of filegroup"""
 
 
