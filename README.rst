@@ -1,6 +1,11 @@
 Gazelle Jsonnet
 ===============
 
+.. All external links are here
+.. _Developer Certificate of Origin: https://cla.vmware.com/dco
+.. _CONTRIBUTING.md: CONTRIBUTING.md
+.. _Apache 2 license: LICENSE.txt
+
 .. role:: direc(code)
 .. role:: value(code)
 .. End of directives
@@ -134,3 +139,16 @@ The following directives are recognized:
 | Comma-separated list of folders that should not be processed. If not specified, Gazelle    |
 | will process all the folders.                                                              |
 +-----------------------------------------------------+--------------------------------------+
+
+Contributing
+------------
+
+The jsonnet-lang-for-gazelle project team welcomes contributions from the community. Before you start working with jsonnet-lang-for-gazelle, please
+read our `Developer Certificate of Origin`_. All contributions to this repository must be
+signed as described on that page. Your signature certifies that you wrote the patch or have the right to pass it on
+as an open-source patch. For more detailed information, refer to `CONTRIBUTING.md`_.
+
+License
+-------
+
+jsonnet-lang-for-gazelle is available under the `Apache 2 license`_.
