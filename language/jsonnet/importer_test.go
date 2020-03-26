@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/bitnami/jsonnet-gazelle/language/jsonnet"
+	"github.com/vmware/jsonnet-lang-for-gazelle/language/jsonnet"
 	gojsonnet "github.com/google/go-jsonnet"
 )
 

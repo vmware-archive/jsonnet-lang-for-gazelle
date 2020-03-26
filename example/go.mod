@@ -1,3 +1,3 @@
-module github.com/bitnami/jsonnet-gazelle/example
+module github.com/vmware/jsonnet-lang-for-gazelle/example
 
 go 1.13

@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/bazelbuild/bazel-gazelle/label"
-	"github.com/bitnami/jsonnet-gazelle/language/jsonnet/fileinfo"
+	"github.com/vmware/jsonnet-lang-for-gazelle/language/jsonnet/fileinfo"
 )
 
 func TestNewFilePath(t *testing.T) {

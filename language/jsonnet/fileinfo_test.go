@@ -13,8 +13,8 @@ import (
 	"testing"
 
 	"github.com/bazelbuild/bazel-gazelle/config"
-	"github.com/bitnami/jsonnet-gazelle/language/jsonnet"
-	"github.com/bitnami/jsonnet-gazelle/language/jsonnet/fileinfo"
+	"github.com/vmware/jsonnet-lang-for-gazelle/language/jsonnet"
+	"github.com/vmware/jsonnet-lang-for-gazelle/language/jsonnet/fileinfo"
 	gojsonnet "github.com/google/go-jsonnet"
 )
 

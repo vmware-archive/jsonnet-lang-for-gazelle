@@ -59,7 +59,7 @@ should look like this:
     git_repository(
         name = "jsonnet_gazelle",
         branch = "master",
-        remote = "https://github.com/bitnami/jsonnet-gazelle",
+        remote = "https://github.com/vmware/jsonnet-lang-for-gazelle",
     )
 
 Add the code below to the BUILD or BUILD.bazel file in the root directory of

@@ -1,4 +1,4 @@
-module github.com/bitnami/jsonnet-gazelle
+module github.com/vmware/jsonnet-lang-for-gazelle
 
 go 1.13
 

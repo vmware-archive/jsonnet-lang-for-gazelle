@@ -11,7 +11,7 @@ import (
 	"github.com/bazelbuild/bazel-gazelle/repo"
 	"github.com/bazelbuild/bazel-gazelle/resolve"
 	"github.com/bazelbuild/bazel-gazelle/rule"
-	"github.com/bitnami/jsonnet-gazelle/language/jsonnet/fileinfo"
+	"github.com/vmware/jsonnet-lang-for-gazelle/language/jsonnet/fileinfo"
 )
 
 // Implement the Resolver interface

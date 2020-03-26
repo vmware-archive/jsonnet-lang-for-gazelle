@@ -1,6 +1,6 @@
 load("@bazel_gazelle//:def.bzl", "gazelle")
 
-# gazelle:prefix github.com/bitnami/jsonnet-gazelle
+# gazelle:prefix github.com/vmware/jsonnet-lang-for-gazelle
 
 gazelle(
     name = "gazelle",
