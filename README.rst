@@ -2,7 +2,7 @@ Gazelle Jsonnet
 ===============
 
 .. All external links are here
-.. _Developer Certificate of Origin: https://cla.vmware.com/dco
+.. _FAQ: https://cla.vmware.com/faq
 .. _CONTRIBUTING.md: CONTRIBUTING.md
 .. _Apache 2 license: LICENSE.txt
 
@@ -143,10 +143,7 @@ The following directives are recognized:
 Contributing
 ------------
 
-The jsonnet-lang-for-gazelle project team welcomes contributions from the community. Before you start working with jsonnet-lang-for-gazelle, please
-read our `Developer Certificate of Origin`_. All contributions to this repository must be
-signed as described on that page. Your signature certifies that you wrote the patch or have the right to pass it on
-as an open-source patch. For more detailed information, refer to `CONTRIBUTING.md`_.
+The jsonnet-lang-for-gazelle project team welcomes contributions from the community. If you wish to contribute code and you have not signed our contributor license agreement (CLA), our bot will update the issue when you open a Pull Request. For any questions about the CLA process, please refer to our `FAQ`_. For more detailed information, refer to `CONTRIBUTING.md`_.
 
 License
 -------
